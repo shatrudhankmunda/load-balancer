@@ -1,0 +1,77 @@
+version: '3.9'
+
+services:
+
+  load-balancer:
+    build: ./load-balancer
+    ports:
+      - "8080:8080"
+    depends_on:
+      - storage-node-1
+      - storage-node-2
+      - storage-node-3
+      - storage-node-4
+    networks:
+      - app-network
+
+  storage-node-1:
+    build: ./storage-node
+    environment:
+      - NODE_ID=1
+    ports:
+      - "8001:8001"
+    networks:
+      - app-network
+    volumes:
+      - ./volumes/node1:/app/chunks
+
+  storage-node-2:
+    build: ./storage-node
+    environment:
+      - NODE_ID=2
+    ports:
+      - "8002:8002"
+    networks:
+      - app-network
+    volumes:
+      - ./volumes/node2:/app/chunks
+
+  storage-node-3:
+    build: ./storage-node
+    environment:
+      - NODE_ID=3
+    ports:
+      - "8003:8003"
+    networks:
+      - app-network
+    volumes:
+      - ./volumes/node3:/app/chunks
+
+  storage-node-4:
+    build: ./storage-node
+    environment:
+      - NODE_ID=4
+    ports:
+      - "8004:8004"
+    networks:
+      - app-network
+    volumes:
+      - ./volumes/node4:/app/chunks
+
+  mysql-db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: cloudstore_remote
+      MYSQL_USER: clouduser
+      MYSQL_PASSWORD: cloudpass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+volumes:
+  mysql-data:
+    
+networks:
+  app-network:
